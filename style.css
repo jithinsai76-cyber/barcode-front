@@ -1,0 +1,498 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+h1 {
+    color: #1c1e21;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Scanner Page Styles --- */
+
+#reader {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    border: 2px solid #eee;
+}
+
+#result-container {
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.indicator {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    color: #333;
+    border: 2px solid #ddd;
+}
+
+#product-info {
+    font-size: 1rem;
+    color: #555;
+    margin-top: 0.5rem;
+}
+
+/* --- THE COLOR LOGIC --- */
+
+.indicator-green {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.indicator-yellow {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+.indicator-red {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+
+/* --- Admin Page Styles --- */
+
+.form-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box; /* Important for padding */
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* --- Messages & Links --- */
+
+.message-success {
+    color: green;
+    margin-top: 1rem;
+}
+
+.message-error {
+    color: red;
+    margin-top: 1rem;
+}
+
+.nav-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Card styles for Admin page --- */
+.card {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Product List Styles (NEW) --- */
+#product-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+#product-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+#product-list li:last-child {
+    border-bottom: none;
+}
+
+#product-list li strong {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+#product-list li span {
+    font-size: 0.9rem;
+    color: #555;
+    background-color: #e9ecef;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+/* --- Updated Product List Styles --- */
+
+#product-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid #eee;
+    background-color: #fff;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+#product-list li:last-child {
+    border-bottom: none;
+}
+
+.product-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-details strong {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.product-details span {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.status-indicator {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* --- Indicator Colors --- */
+.status-green {
+    background-color: #d4edda;
+    color: #155724;
+}
+.status-yellow {
+    background-color: #fff3cd;
+    color: #856404;
+}
+.status-red {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+/* --- Bill Styles (Scanner Page) --- */
+#bill-container {
+    margin-top: 2rem;
+}
+
+#bill-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+#bill-items li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid #eee;
+    background-color: #fff;
+    margin-bottom: 8px;
+    border-radius: 6px;
+}
+
+#print-btn {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #28a745; /* Green color */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.2s;
+}
+
+#print-btn:hover {
+    background-color: #218838;
+}
+
+
+/* --- Print Styles --- */
+
+/* By default, hide the print-only version */
+#print-version {
+    display: none;
+}
+
+@media print {
+    /* Hide everything that ISN'T the print version */
+    body > .container, .no-print {
+        display: none !important;
+    }
+
+    /* Show the print version and style it */
+    #print-version {
+        display: block;
+        width: 100%;
+    }
+    
+    #print-version h1 {
+        text-align: center;
+        border-bottom: 2px dashed #000;
+        padding-bottom: 10px;
+    }
+
+    #print-items {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #print-items li {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #ccc;
+    }
+}
+/* --- Admin Page: Card Header --- */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.card-header h2 {
+    margin: 0;
+}
+
+/* --- Admin Page: Print Report Button --- */
+#print-report-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #007bff; /* Blue color */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#print-report-btn:hover {
+    background-color: #0056b3;
+}
+
+
+/* --- Admin Page: Print Styles --- */
+
+/* By default, hide the admin print version */
+#print-version-admin {
+    display: none;
+}
+
+@media print {
+    /* Hide all non-print elements */
+    body > .container, .no-print, .nav-link {
+        display: none !important;
+    }
+
+    /* Show the admin print version */
+    #print-version-admin {
+        display: block;
+        width: 100%;
+        font-family: Arial, sans-serif;
+    }
+    
+    #print-version-admin h1 {
+        text-align: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+        color: #000;
+    }
+
+    #print-list-admin {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #print-list-admin li {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 4px;
+        border-bottom: 1px dashed #ccc;
+        font-size: 14px;
+    }
+
+    #print-list-admin li span {
+        flex-basis: 33%;
+    }
+}
+/* --- index.html: Manual Entry Styles --- */
+
+.secondary-btn {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #007bff;
+    background-color: #e7f3ff;
+    border: 1px solid #007bff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+}
+
+.secondary-btn:hover {
+    background-color: #d0e7ff;
+}
+
+#manual-entry-container {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fdfdfd;
+}
+
+#manual-entry-container button[type="submit"] {
+    margin-top: 1rem;
+}
+
+
+/* --- reports.html: Report Column Styles --- */
+
+.report-columns {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.report-column h2 {
+    font-size: 1.25rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-top: 0;
+    color: #fff;
+    text-align: center;
+}
+
+.report-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.report-list li {
+    background-color: #fff;
+    border: 1px solid #eee;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.report-list li strong {
+    font-size: 1.1rem;
+    color: #333;
+}
+.report-list li span {
+    font-size: 0.9rem;
+    color: #555;
+}
+.report-list li small {
+    font-size: 0.9rem;
+    color: #777;
+    font-weight: 600;
+}
+
+
+/* Column Header Colors */
+.status-red-header {
+    background-color: #721c24;
+}
+.status-yellow-header {
+    background-color: #856404;
+}
+.status-green-header {
+    background-color: #155724;
+}
+
+
+/* Make columns side-by-side on wider screens */
+@media (min-width: 768px) {
+    .report-columns {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .report-column {
+        flex-basis: 32%;
+    }
+}

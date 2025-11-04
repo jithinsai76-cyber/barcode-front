@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Reports</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Product Expiry Report</h1>
+        
+        <div class="report-columns">
+            
+            <div class="report-column">
+                <h2 class="status-red-header">Expired</h2>
+                <ul id="expired-list" class="report-list">
+                    </ul>
+            </div>
+            
+            <div class="report-column">
+                <h2 class="status-yellow-header">Expiring Soon (<= 7 Days)</h2>
+                <ul id="soon-list" class="report-list">
+                    </ul>
+            </div>
+            
+            <div class="report-column">
+                <h2 class="status-green-header">Fresh (> 7 Days)</h2>
+                <ul id="fresh-list" class="report-list">
+                    </ul>
+            </div>
+
+        </div>
+
+        <a href="/" class="nav-link no-print">Go to Scanner Page</a>
+        <a href="/admin.html" class="nav-link no-print">Go to Admin Page</a>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        // Get list elements
+        const expiredList = document.getElementById('expired-list');
+        const soonList = document.getElementById('soon-list');
+        const freshList = document.getElementById('fresh-list');
+
+        // Function to create a product list item
+        function createProductLi(product, daysRemaining) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <strong>${product.name}</strong>
+                <span>${product.barcode} - ${product.quantity || ''}</span>
+                <small>Expires: ${new Date(product.expiryDate).toLocaleDateString()}</small>
+            `;
+            return li;
+        }
+
+        // --- Runs when the page first loads ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch(`${API_URL}/api/products`);
+                if (!response.ok) throw new Error('Server error');
+                
+                const products = await response.json();
+
+                if (products.length === 0) {
+                    freshList.innerHTML = '<li>No products in database.</li>';
+                    return;
+                }
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); 
+                const msPerDay = 1000 * 60 * 60 * 24;
+
+                // Sort products into columns
+                products.forEach(product => {
+                    const expiryDate = new Date(product.expiryDate);
+                    const daysRemaining = Math.round((expiryDate - today) / msPerDay);
+                    
+                    const productLi = createProductLi(product, daysRemaining);
+
+                    if (daysRemaining < 0) {
+                        expiredList.appendChild(productLi);
+                    } else if (daysRemaining <= 7) {
+                        soonList.appendChild(productLi);
+                    } else {
+                        freshList.appendChild(productLi);
+                    }
+                });
+
+            } catch (error) {
+                console.error(error);
+                freshList.innerHTML = '<li>Error loading products.</li>';
+            }
+        });
+    </script>
+
+</body>
+</html>

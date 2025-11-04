@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expiry Date Scanner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container no-print">
+        <h1>Product Scanner</h1>
+        
+        <div id="reader"></div>
+        
+        <div id="result-container">
+            <div id="result" class="indicator">
+                Point camera at a barcode...
+            </div>
+            <div id="product-info"></div>
+        </div>
+
+        <button id="toggle-manual-btn" class="no-print secondary-btn">Enter Barcode Manually</button>
+        <div id="manual-entry-container" class="no-print" style="display: none;">
+            <form id="manual-form">
+                <div class="form-group">
+                    <label for="manual-barcode">Enter Barcode</label>
+                    <input type="text" id="manual-barcode" placeholder="Type barcode number...">
+                </div>
+                <button type="submit">Check Product</button>
+            </form>
+        </div>
+        <a href="/admin.html" class="nav-link">Go to Admin Page</a>
+        <a href="/reports.html" class="nav-link">View Product Reports</a>
+    </div>
+
+    <div id="bill-container" class="container">
+        <h2>Scanned Items</h2>
+        <ul id="bill-items">
+            </ul>
+        <button id="print-btn" class="no-print">Print Bill</button>
+    </div>
+
+    <div id="print-version">
+        <h1>Scan Receipt</h1>
+        <ul id="print-items"></ul>
+        <p>Total Items: <span id="print-total"></span></p>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let scannedItems = []; 
+
+        const resultEl = document.getElementById('result');
+        const infoEl = document.getElementById('product-info');
+        const billListEl = document.getElementById('bill-items');
+        const printBtn = document.getElementById('print-btn');
+
+        // === NEW: Manual Entry Elements ===
+        const toggleManualBtn = document.getElementById('toggle-manual-btn');
+        const manualEntryContainer = document.getElementById('manual-entry-container');
+        const manualForm = document.getElementById('manual-form');
+        const manualBarcodeEl = document.getElementById('manual-barcode');
+        // === END NEW ===
+
+
+        // --- 1. Runs when the page loads ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                config,
+                onScanSuccess, // This function is now the main handler
+                onScanFailure
+            );
+
+            // === NEW: Event Listeners for Manual Entry ===
+            toggleManualBtn.addEventListener('click', () => {
+                const isHidden = manualEntryContainer.style.display === 'none';
+                manualEntryContainer.style.display = isHidden ? 'block' : 'none';
+            });
+
+            manualForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const barcode = manualBarcodeEl.value;
+                if (barcode) {
+                    onScanSuccess(barcode); // REUSE the same function
+                    manualBarcodeEl.value = ''; // Clear input
+                }
+            });
+            // === END NEW ===
+        });
+
+        // --- 2. Runs on SCAN or MANUAL SUBMIT ---
+        // (No 'async' needed if not using 'decodedResult')
+        async function onScanSuccess(barcodeText) { 
+            
+            try {
+                // Send barcode to backend
+                const response = await fetch(`${API_URL}/api/products/${barcodeText}`);
+
+                if (response.status === 404) {
+                    setIndicator('red', `Product (${barcodeText}) not found.`);
+                    return;
+                }
+                if (!response.ok) throw new Error('Server error');
+
+                const product = await response.json();
+                
+                const expiryDate = new Date(product.expiryDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); 
+                const msPerDay = 1000 * 60 * 60 * 24;
+                const daysRemaining = Math.round((expiryDate - today) / msPerDay);
+
+                const scanResult = {
+                    name: product.name,
+                    quantity: product.quantity,
+                    barcode: product.barcode,
+                    daysRemaining: daysRemaining
+                };
+
+                if (daysRemaining < 0) {
+                    setIndicator('red', `EXPIRED ${Math.abs(daysRemaining)} days ago.`);
+                } else if (daysRemaining <= 7) { 
+                    setIndicator('yellow', `EXPIRES SOON. ${daysRemaining} days left.`);
+                    addItemToBill(scanResult); 
+                } else { 
+                    setIndicator('green', `FRESH. Expires in ${daysRemaining} days.`);
+                    addItemToBill(scanResult); 
+                }
+
+            } catch (error) {
+                setIndicator('red', 'Error checking product.');
+                console.error(error);
+            }
+        }
+
+        // --- 3. Updates the color and text of the indicator ---
+        function setIndicator(color, message) {
+            resultEl.className = `indicator indicator-${color}`;
+            resultEl.textContent = message.split('.')[0]; 
+            infoEl.textContent = message; 
+        }
+        
+        // --- 4. Adds an item to the on-screen bill ---
+        function addItemToBill(item) {
+            // Check if item is already in the bill
+            const existingItem = scannedItems.find(i => i.barcode === item.barcode);
+            if (existingItem) {
+                // Optional: You could update quantity here, but for now we'll just skip
+                return;
+            }
+
+            scannedItems.push(item);
+            const li = document.createElement('li');
+            
+            let statusClass = 'green';
+            let statusText = `${item.daysRemaining} days left`;
+            if (item.daysRemaining <= 7) statusClass = 'yellow';
+
+            li.innerHTML = `
+                <div class="product-details">
+                    <strong>${item.name}</strong>
+                    <span>${item.barcode} - ${item.quantity || ''}</span>
+                </div>
+                <div class="status-indicator status-${statusClass}">
+                    ${statusText}
+                </div>
+            `;
+            billListEl.appendChild(li);
+        }
+
+        // --- 5. Print the bill ---
+        printBtn.addEventListener('click', () => {
+            // (No changes to this function)
+            const printList = document.getElementById('print-items');
+            const printTotal = document.getElementById('print-total');
+            
+            printList.innerHTML = '';
+            
+            scannedItems.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${item.name} (${item.quantity || ''})</span>
+                    <span>${item.barcode}</span>
+                `;
+                printList.appendChild(li);
+            });
+            printTotal.textContent = scannedItems.length;
+
+            window.print();
+        });
+
+        function onScanFailure(error) {
+            // This just means no barcode was found in a frame
+        }
+    </script>
+
+</body>
+</html>
